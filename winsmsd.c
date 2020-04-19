@@ -75,6 +75,8 @@ BOOL Init(VOID)
     if (pNtDuplicateObject && pNtQuerySystemInformation && pNtQueryObject) {
         return TRUE;
     } else {
+        WSACleanup();
+
         return FALSE;
     }
 }
@@ -207,11 +209,13 @@ SOCKET GetSocket(HANDLE hProcess, PBYTE pIpAddress, USHORT dwPort)
                                                      0,
                                                      WSA_FLAG_OVERLAPPED);
                             if (TargetSocket != INVALID_SOCKET) {
+                                fwprintf(stdout, L"[OK] Socket was duplicated!\n");
+
                                 CloseHandle(TargetHandle);
                                 free(pObjNameInfo);
+                                free(pSysHandleInfo);
                                 pObjNameInfo = NULL;
-
-                                fwprintf(stdout, L"[OK] Socket was duplicated!\n");
+                                pSysHandleInfo = NULL;
 
                                 return TargetSocket;
                             }
